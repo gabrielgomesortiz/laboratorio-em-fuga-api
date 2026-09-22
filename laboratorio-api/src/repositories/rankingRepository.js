@@ -2,7 +2,12 @@ const supabase = require('../config/supabase');
 
 class RankingRepository {
     async listarTodos() {
-        const { data, error } = await supabase.from('ranking').select('*');
+        // Busca todos os registros do ranking ordenando da maior pontuação para a menor.
+        // Se houver chave estrangeira para 'jogadores', traz o nome do jogador no mesmo SELECT.
+        const { data, error } = await supabase
+            .from('ranking')
+            .select('*, jogadores(nome)')
+            .order('pontuacao', { ascending: false });
 
         if (error) {
             throw error;
@@ -12,8 +17,13 @@ class RankingRepository {
     }
 
     async buscarPorId(id) {
-        const { data, error } = await supabase.from('ranking').select('*').eq('id', id).single();
+        const { data, error } = await supabase
+            .from('ranking')
+            .select('*, jogadores(nome)')
+            .eq('id', id)
+            .single();
 
+        // PGRST116 é retornado pelo Supabase quando .single() não encontra linhas
         if (error && error.code !== 'PGRST116') {
             throw error;
         }
@@ -22,7 +32,11 @@ class RankingRepository {
     }
 
     async criar(dados) {
-        const { data, error } = await supabase.from('ranking').insert(dados).select().single();
+        const { data, error } = await supabase
+            .from('ranking')
+            .insert(dados)
+            .select()
+            .single();
 
         if (error) {
             throw error;
@@ -32,7 +46,12 @@ class RankingRepository {
     }
 
     async atualizar(id, dados) {
-        const { data, error } = await supabase.from('ranking').update(dados).eq('id', id).select().single();
+        const { data, error } = await supabase
+            .from('ranking')
+            .update(dados)
+            .eq('id', id)
+            .select()
+            .single();
 
         if (error) {
             throw error;
@@ -42,7 +61,10 @@ class RankingRepository {
     }
 
     async remover(id) {
-        const { error } = await supabase.from('ranking').delete().eq('id', id);
+        const { error } = await supabase
+            .from('ranking')
+            .delete()
+            .eq('id', id);
 
         if (error) {
             throw error;

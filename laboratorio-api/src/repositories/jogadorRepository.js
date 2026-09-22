@@ -2,7 +2,10 @@ const supabase = require('../config/supabase');
 
 class JogadorRepository {
     async listarTodos() {
-        const { data, error } = await supabase.from('jogadores').select('*');
+        const { data, error } = await supabase
+            .from('jogadores')
+            .select('*')
+            .order('nome', { ascending: true });
 
         if (error) {
             throw error;
@@ -12,7 +15,11 @@ class JogadorRepository {
     }
 
     async buscarPorId(id) {
-        const { data, error } = await supabase.from('jogadores').select('*').eq('id', id).single();
+        const { data, error } = await supabase
+            .from('jogadores')
+            .select('*')
+            .eq('id', id)
+            .single();
 
         if (error && error.code !== 'PGRST116') {
             throw error;
@@ -21,8 +28,26 @@ class JogadorRepository {
         return data;
     }
 
+    async buscarPorNome(nome) {
+        const { data, error } = await supabase
+            .from('jogadores')
+            .select('*')
+            .eq('nome', nome)
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        return data;
+    }
+
     async criar(dados) {
-        const { data, error } = await supabase.from('jogadores').insert(dados).select().single();
+        const { data, error } = await supabase
+            .from('jogadores')
+            .insert(dados)
+            .select()
+            .single();
 
         if (error) {
             throw error;
@@ -32,7 +57,12 @@ class JogadorRepository {
     }
 
     async atualizar(id, dados) {
-        const { data, error } = await supabase.from('jogadores').update(dados).eq('id', id).select().single();
+        const { data, error } = await supabase
+            .from('jogadores')
+            .update(dados)
+            .eq('id', id)
+            .select()
+            .single();
 
         if (error) {
             throw error;
@@ -42,7 +72,10 @@ class JogadorRepository {
     }
 
     async remover(id) {
-        const { error } = await supabase.from('jogadores').delete().eq('id', id);
+        const { error } = await supabase
+            .from('jogadores')
+            .delete()
+            .eq('id', id);
 
         if (error) {
             throw error;
